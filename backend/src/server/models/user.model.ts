@@ -5,8 +5,8 @@ export class UserModelwithID {
     public name : string,
     public email : string,
     public id : ObjectId,
-    public age : number,
-    public password : string
+    public password : string,
+    public institution: string 
   ) {}
 }
 
@@ -14,7 +14,7 @@ export class UserModel {
   constructor(
     public name : string,
     public email : string,
-    public age : number,
-    public password : string
+    public password : string,
+    public institution: string
   ) {}
 }

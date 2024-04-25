@@ -10,6 +10,7 @@ type SubtypeConstructor<Constructor extends new (...args: any) => any, Subtype> 
 export interface ProtoGrpcType {
   userPackage: {
     Empty: MessageTypeDefinition
+    LoginRequest: MessageTypeDefinition
     Response: MessageTypeDefinition
     User: MessageTypeDefinition
     UserID: MessageTypeDefinition

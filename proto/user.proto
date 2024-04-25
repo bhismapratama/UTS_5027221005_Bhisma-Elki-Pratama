@@ -7,13 +7,14 @@ service UserService {
   rpc CreateUser (User) returns (Response) {};
   rpc UpdateUser (UserWithID) returns (Response) {};
   rpc DeleteUser (UserID) returns (Response) {};
+  rpc Login (LoginRequest) returns (Response) {};
 }
 
 message User {
   string email = 1;
   string name = 2;
   string password = 3;
-  int64 age = 4;
+  string institution = 4;
 }
 
 message UserID {
@@ -34,3 +35,8 @@ message Response {
 }
 
 message Empty {}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}

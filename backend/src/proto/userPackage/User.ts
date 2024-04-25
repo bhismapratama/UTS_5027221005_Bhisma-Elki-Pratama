@@ -1,17 +1,16 @@
 // Original file: ../proto/user.proto
 
-import type { Long } from '@grpc/proto-loader';
 
 export interface User {
   'email'?: (string);
   'name'?: (string);
   'password'?: (string);
-  'age'?: (number | string | Long);
+  'institution'?: (string);
 }
 
 export interface User__Output {
   'email'?: (string);
   'name'?: (string);
   'password'?: (string);
-  'age'?: (Long);
+  'institution'?: (string);
 }

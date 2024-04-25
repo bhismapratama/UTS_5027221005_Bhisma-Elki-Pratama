@@ -1,10 +1,10 @@
 // Original file: ../proto/user.proto
 
 
-export interface UserId {
+export interface UserID {
   'id'?: (string);
 }
 
-export interface UserId__Output {
+export interface UserID__Output {
   'id'?: (string);
 }

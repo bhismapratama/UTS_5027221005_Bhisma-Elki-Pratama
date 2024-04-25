@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcom - </title>
+</head>
+
+<body>
+    <h2 id="welcome"></h2>
+    <a href="./login.html" id="login">login</a>
+    <button onclick="logout()" id="logout">logout</button>
+    <div id="userData"></div>
+
+    <script>
+        const welcome = document.getElementById('welcome')
+
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        }
+
+        const loggedInUserJSON = localStorage.getItem('loggedInUser');
+        console.log(loggedInUserJSON);
+        const buttonLogout = document.getElementById('logout')
+        const login = document.getElementById('login')
+
+        if (loggedInUserJSON) {
+            const loggedInUser = JSON.parse(loggedInUserJSON);
+            login.style.display = 'none'
+
+            document.title = `${loggedInUser.data}`
+            welcome.innerHTML = `${loggedInUser.data}`
+            document.getElementById('userData').innerHTML = `
+                <h3>Data Login:</h3>
+                <p>Email: ${loggedInUser.email}</p>
+                <p>Password: ${loggedInUser.password}</p>
+            `;
+
+        } else {
+            buttonLogout.style.display = 'none'
+            document.getElementById('userData').innerHTML = `<p>Belum ada data login tersimpan.</p>`;
+        }
+    </script>
+</body>
+
+</html>

@@ -10,7 +10,8 @@ import path from 'path'
 import { UserServerService } from './services/user.service'
 import { Response } from '../proto/userPackage/Response'
 import { UserWithID } from '../proto/userPackage/UserWithID'
-import { UserId } from '../proto/userPackage/UserId'
+import { UserID } from '../proto/userPackage/UserID'
+import { LoginRequest } from '../proto/userPackage/LoginRequest'
 
 const PROTO_PATH : string = "../../../proto/user.proto"
 const PORT : number = 5001
@@ -65,9 +66,15 @@ const getServer = () => {
         callback(null, res)
       })
     },
-    'DeleteUser' : (call : grpc.ServerUnaryCall<UserId, Response>, callback : grpc.sendUnaryData<Response>) => {
+    'DeleteUser' : (call : grpc.ServerUnaryCall<UserID, Response>, callback : grpc.sendUnaryData<Response>) => {
       const userId = call.request
       UserServerService.deleteUser(userId).then((res : Response | undefined) => {
+        callback(null, res)
+      })
+    },
+    'Login': (call: grpc.ServerUnaryCall<LoginRequest, Response>, callback: grpc.sendUnaryData<Response>) => {
+      const loginRequest = call.request
+      UserServerService.login(loginRequest).then((res: Response | undefined) => {
         callback(null, res)
       })
     }

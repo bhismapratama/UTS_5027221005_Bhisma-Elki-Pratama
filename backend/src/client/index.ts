@@ -2,10 +2,11 @@ import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
 import { ProtoGrpcType} from '../proto/user'
 import path from 'path'
-import { UserId } from '../proto/userPackage/UserId'
+import { UserID } from '../proto/userPackage/UserID'
 import { User } from '../proto/userPackage/User'
 import { UserWithID } from '../proto/userPackage/UserWithID'
 import express, { Request, Response } from 'express'
+import { LoginRequest } from '../proto/userPackage/LoginRequest';
 
 const PROTO_PATH : string = "../../../proto/user.proto"
 const PORT : number = 5001
@@ -38,8 +39,10 @@ client.waitForReady(deadline, (err) => {
 
 const onClientReady = () => {
   console.log(`Client running on port ${PORT}`)
+  const corsMiddleware = require("../middleware/authCors");
   const app = express()
   app.use(express.json())
+  app.use(corsMiddleware);
 
   app.get('/user', (req : Request, res : Response) => {
     client.GetAll(
@@ -87,7 +90,7 @@ const onClientReady = () => {
   })
 
   app.delete('/user/:id', (req : Request, res : Response) => {
-    const userId : UserId = {
+    const userId : UserID = {
       id : req.params.id
     }
     client.deleteUser(userId, 
@@ -100,6 +103,19 @@ const onClientReady = () => {
       }
     )
   })
+
+  app.post('/login', (req: Request, res: Response) => {
+    const loginInput: LoginRequest = req.body;
+    client.Login(loginInput,
+      (err, _res) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        res.send(_res);
+      }
+    );
+  });
 
   app.listen(3000, () => {
     console.log("express is started")

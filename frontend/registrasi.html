@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protobuf - Bhisma Elki Pratama</title>
+</head>
+
+<body>
+    <h2>Registrasi</h2>
+    <form id="registrationForm" action="#" method="post">
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <label for="name">Nama:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="institution">Institusi:</label>
+            <input type="text" id="institution" name="institution">
+        </div>
+        <button type="submit">Submit</button>
+        <a href="./login.html">login</a>
+    </form>
+    <script>
+        const display = document.getElementById('display');
+
+        document.getElementById('registrationForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+            const institution = document.getElementById('institution').value;
+
+            const data = {
+                email: email,
+                password: password,
+                name: name,
+                institution: institution
+            };
+
+            fetch('http://localhost:3000/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    window.location.href = 'login.html'
+                    document.getElementById('registrationForm').reset();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Registrasi gagal, silakan coba lagi.');
+                });
+        });
+
+    </script>
+</body>
+
+</html>
