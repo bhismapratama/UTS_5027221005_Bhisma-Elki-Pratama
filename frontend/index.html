@@ -4,17 +4,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcom - </title>
+    <title>ETS - Bhisma Elki Pratama</title>
+
+    <style>
+        *,
+        body,
+        html {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'poppins', sans-serif;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #userData {
+            font-size: 18px;
+        }
+
+        .notifications-container {
+            width: 440px;
+            height: auto;
+            padding: 2rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: rgb(210, 255, 223);
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-shrink-0 {
+            flex-shrink: 0;
+        }
+
+        .success {
+            padding: 1rem;
+            border-radius: 2rem;
+        }
+
+        .succes-svg {
+            color: rgb(74 222 128);
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .success-prompt-wrap {
+            margin-left: 0.75rem;
+        }
+
+        .success-prompt-heading {
+            font-weight: bold;
+            font-size: 18px;
+            color: rgb(22 101 52);
+        }
+
+        .success-prompt-prompt {
+            margin-top: 0.5rem;
+            font-size: 16px;
+            color: rgb(21 128 61);
+        }
+
+        .success-button-container {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .success-button-main {
+            margin-top: 30px;
+            cursor: pointer;
+            padding: .5rem 2rem;
+            background-color: rgb(24, 156, 73);
+            color: white;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            border-radius: 0.375rem;
+            border: none;
+            transition: all .3s ease-in-out;
+        }
+
+        .success-button-main:hover {
+            background-color: #0c6537;
+        }
+
+        .success-button-secondary {
+            margin-top: 30px;
+            cursor: pointer;
+            padding: .5rem 2rem;
+            background-color: rgb(11, 110, 47);
+            color: white;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            border-radius: 0.375rem;
+            border: none;
+            transition: all .3s ease-in-out;
+        }
+
+        .success-button-secondary:hover {
+            background-color: rgb(2, 61, 24);
+        }
+
+        .success-button-secondary:active {
+            transform: scale(.98);
+        }
+    </style>
 </head>
 
 <body>
-    <h2 id="welcome"></h2>
-    <a href="./login.html" id="login">login</a>
-    <button onclick="logout()" id="logout">logout</button>
-    <div id="userData"></div>
+    <div class="notifications-container">
+        <div class="success">
+            <div class="flex">
+                <div class="flex-shrink-0" id="logo">
+                    <svg class="succes-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                        aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="success-prompt-wrap">
+                    <p class="success-prompt-heading" id="welcome">
+                    </p>
+                    <div class="success-prompt-prompt">
+                        <div id="userData"></div>
+                        <!-- <p></p> -->
+                    </div>
+                    <div class="success-button-container">
+                        <a class="success-button-main" href="./login.html" id="login">login</a>
+                        <button class="success-button-secondary" onclick="logout()" id="logout">logout</button>
+                        <!-- <button type="button" class="success-button-main">View status</button>
+                        <button type="button" class="success-button-secondary">Dismiss</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const welcome = document.getElementById('welcome')
+        const dataDisplay = document.getElementById('userData')
+        const logo = document.getElementById('logo')
 
         function logout() {
             localStorage.removeItem('loggedInUser');
@@ -30,17 +172,19 @@
             const loggedInUser = JSON.parse(loggedInUserJSON);
             login.style.display = 'none'
 
-            document.title = `${loggedInUser.data}`
-            welcome.innerHTML = `${loggedInUser.data}`
-            document.getElementById('userData').innerHTML = `
-                <h3>Data Login:</h3>
+            document.title = `${loggedInUser.data} - ETS - Bhisma Elki Pratama`
+            welcome.innerHTML = `Login successful - ${loggedInUser.data}`
+            // dataDisplay.innerHTML = `${loggedInUser.data}`;
+            dataDisplay.innerHTML = `
+                <br/>
                 <p>Email: ${loggedInUser.email}</p>
                 <p>Password: ${loggedInUser.password}</p>
+                <br/>
             `;
-
         } else {
             buttonLogout.style.display = 'none'
-            document.getElementById('userData').innerHTML = `<p>Belum ada data login tersimpan.</p>`;
+            logo.style.display = 'none'
+            document.getElementById('userData').innerHTML = `<p>Belum ada data login tersimpan 🤗🙌..</p>`;
         }
     </script>
 </body>

@@ -22,7 +22,7 @@ message UserID {
 }
 
 message Users {
-   repeated User users = 1;
+  repeated User users = 1;
 }
 
 message UserWithID {
@@ -32,6 +32,7 @@ message UserWithID {
 
 message Response {
   string responseMsg = 1;
+  int32 code = 2;
 }
 
 message Empty {}

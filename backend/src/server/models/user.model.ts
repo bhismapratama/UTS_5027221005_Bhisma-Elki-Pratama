@@ -1,10 +1,8 @@
-import { ObjectId } from "mongodb";
-
 export class UserModelwithID {
   constructor(
     public name : string,
     public email : string,
-    public id : ObjectId,
+    public id : string,
     public password : string,
     public institution: string 
   ) {}

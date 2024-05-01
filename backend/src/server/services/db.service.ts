@@ -1,22 +1,29 @@
 require('dotenv').config();
 
-import * as mongo from 'mongodb'
+import { MongoClient, Db, Collection } from 'mongodb';
 
-export const collections: { users? : mongo.Collection} = {}
+export const collections: { users?: Collection } = {};
 
-export async function databaseConnection () {
-  const mongoURI = process.env.PUBLIC_URI_IS
+export async function databaseConnection() {
+  const mongoURI = process.env.PUBLIC_URI_IS;
 
   if (!mongoURI) {
     throw new Error('MongoDB URI is not provided in environment variables.');
   }
 
-  const client : mongo.MongoClient = new mongo.MongoClient(mongoURI)
+  const client: MongoClient = new MongoClient(mongoURI);
 
-  const db : mongo.Db = client.db("grpc")
+  try {
+    await client.connect();
 
-  const userCollection : mongo.Collection = db.collection('user')  
-  collections.users = userCollection
+    const db: Db = client.db("grpc");
 
-  console.log("Succes connection to database")
+    const userCollection: Collection = db.collection('user');
+    collections.users = userCollection;
+
+    console.log("Succes connection to database");
+  } catch (error) {
+    console.error("Error connecting to database:", error);
+    throw error;
+  }
 }

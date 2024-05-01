@@ -1,124 +1,131 @@
 import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
-import { ProtoGrpcType} from '../proto/user'
+import { ProtoGrpcType } from '../proto/user'
 import path from 'path'
 import { UserID } from '../proto/userPackage/UserID'
 import { User } from '../proto/userPackage/User'
 import { UserWithID } from '../proto/userPackage/UserWithID'
 import express, { Request, Response } from 'express'
 import { LoginRequest } from '../proto/userPackage/LoginRequest';
+import authCors from '../middleware/authCors'
 
-const PROTO_PATH : string = "../../../proto/user.proto"
-const PORT : number = 5001
+const PROTO_PATH: string = "../../../proto/user.proto"
+const PORT: number = 8080
 
-const options = {
-  keepCase: true,
-  longs: String,
-  enums: String,
-  defaults: true,
-  oneofs: true,
-}
+const loadProto = async () => {
+  const options = {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true,
+  };
 
-const protoBuf = protoLoader.loadSync(path.resolve(__dirname, PROTO_PATH), options)
-const grpcObj = (grpc.loadPackageDefinition(protoBuf) as unknown) as ProtoGrpcType
+  const protoBuf = await protoLoader.load(path.resolve(__dirname, PROTO_PATH), options);
+  return grpc.loadPackageDefinition(protoBuf) as unknown as ProtoGrpcType;
+};
 
-const client = new grpcObj.userPackage.UserService(
-  `0.0.0.0:${PORT}`, grpc.credentials.createInsecure()
-)
+const startServer = async () => {
+  const grpcObj = await loadProto();
+  const client = new (grpcObj.userPackage.UserService)(
+    `0.0.0.0:${PORT}`,
+    grpc.credentials.createInsecure()
+  );
 
-const deadline = new Date()
-deadline.setSeconds(deadline.getSeconds() + 5)
-client.waitForReady(deadline, (err) => {
-  if(err) {
-    console.error(err)
-    return
-  }
-  onClientReady()
-})
+  console.log(`Server running on port ${PORT}`);
 
+  const app = express();
+  app.use(express.json());
+  app.use(authCors);
 
-const onClientReady = () => {
-  console.log(`Client running on port ${PORT}`)
-  const corsMiddleware = require("../middleware/authCors");
-  const app = express()
-  app.use(express.json())
-  app.use(corsMiddleware);
-
-  app.get('/user', (req : Request, res : Response) => {
-    client.GetAll(
-      {},
-      (err, _res) => {
-        if(err) {
-          console.error(err)
-          return
-        }
-        res.send(_res)
-    })
-  })
-  
-  app.post('/user', (req : Request, res : Response) => {
-    const createInput : User = req.body
-    const user : User = createInput 
-    client.createUser(user, 
-      (err, _res) => {
-        if(err) {
-          console.error(err)
-          return
-        }
-        res.send(_res)
-      }
-    )
-  })
-  
-  app.put('/user/:id', (req : Request, res : Response) => {
-    const user : UserWithID = {
-      userId : {
-        id : req.params.id 
-      },
-      user : req.body 
+  app.get('/user', async (req: Request, res: Response) => {
+    try {
+      const response = await new Promise((resolve, reject) => {
+        client.GetAll({}, (failed: any, success: any) => {
+          if (failed) reject(failed);
+          else resolve(success);
+        });
+      });
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
     }
-
-    client.updateUser(user, 
-      (err, _res) => {
-        if(err) {
-          console.error(err)
-          return
-        }
-        res.send(_res)
-      }
-    )
-  })
-
-  app.delete('/user/:id', (req : Request, res : Response) => {
-    const userId : UserID = {
-      id : req.params.id
-    }
-    client.deleteUser(userId, 
-      (err, _res) => {
-        if(err) {
-          console.error(err)
-          return
-        }
-        res.send(_res)
-      }
-    )
-  })
-
-  app.post('/login', (req: Request, res: Response) => {
-    const loginInput: LoginRequest = req.body;
-    client.Login(loginInput,
-      (err, _res) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        res.send(_res);
-      }
-    );
   });
 
-  app.listen(3000, () => {
-    console.log("express is started")
-  })
+  app.post('/user', async (req: Request, res: Response) => {
+    try {
+      const response = await new Promise((resolve, reject) => {
+        const createInput: User = req.body
+        client.createUser(createInput, (failed: any, success: any) => {
+          if (failed) reject(failed);
+          else resolve(success);
+        });
+      });
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
 
-}
+  app.patch('/user/:id', async (req: Request, res: Response) => {
+    try {
+      const user: UserWithID = {
+        userId: { id: req.params.id },
+        user: req.body
+      };
+      const response = await new Promise((resolve, reject) => {
+        client.updateUser(user, (failed: any, success: any) => {
+          if (failed) reject(failed);
+          else resolve(success);
+        });
+      });
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  app.delete('/user/:id', async (req: Request, res: Response) => {
+    try {
+      const userId: UserID = { id: req.params.id };
+      const response = await new Promise((resolve, reject) => {
+        client.deleteUser(userId, (failed: any, success: any) => {
+          if (failed) reject(failed);
+          else resolve(success);
+        });
+      });
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  app.post('/login', async (req: Request, res: Response) => {
+    try {
+      const loginInput: LoginRequest = req.body;
+      const response = await new Promise((resolve, reject) => {
+        client.Login(loginInput, (failed: any, success: any) => {
+          if (failed) reject(failed);
+          else resolve(success);
+        });
+      });
+      res.send(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  const listen = 3001
+  app.listen(listen, () => {
+    console.log(`Client is started on port ${listen}`);
+  });
+};
+
+startServer().catch((error) => {
+  console.error('Failed to start server:', error);
+});

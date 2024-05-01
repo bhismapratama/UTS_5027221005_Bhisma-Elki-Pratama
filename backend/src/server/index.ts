@@ -1,85 +1,121 @@
-import * as grpc from '@grpc/grpc-js'
-import * as protoLoader from '@grpc/proto-loader'
-import { ProtoGrpcType} from '../proto/user'
-import { UserServiceHandlers } from '../proto/userPackage/UserService'
-import { Empty } from '../proto/userPackage/Empty'
-import { Users } from '../proto/userPackage/Users'
-import { User } from '../proto/userPackage/User'
-import { databaseConnection } from './services/db.service' 
-import path from 'path'
-import { UserServerService } from './services/user.service'
-import { Response } from '../proto/userPackage/Response'
-import { UserWithID } from '../proto/userPackage/UserWithID'
-import { UserID } from '../proto/userPackage/UserID'
-import { LoginRequest } from '../proto/userPackage/LoginRequest'
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import { ProtoGrpcType } from '../proto/user';
+import { UserServiceHandlers } from '../proto/userPackage/UserService';
+import { Empty } from '../proto/userPackage/Empty';
+import { User } from '../proto/userPackage/User';
+import { UserWithID } from '../proto/userPackage/UserWithID';
+import { UserID } from '../proto/userPackage/UserID';
+import { LoginRequest } from '../proto/userPackage/LoginRequest';
+import { databaseConnection } from './services/db.service';
+import { UserServerService } from './services/user.service';
+import path from 'path';
 
-const PROTO_PATH : string = "../../../proto/user.proto"
-const PORT : number = 5001
+const PROTO_PATH: string = "../../../proto/user.proto";
+const PORT: number = 8080;
 
-const options : protoLoader.Options = {
-  keepCase: true,
-  longs: String,
-  enums: String,
-  defaults: true,
-  oneofs: true,
-}
+const loadProto = async () => {
+  const options = {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true,
+  };
 
-const protoBuf : protoLoader.PackageDefinition = protoLoader.loadSync(path.resolve(__dirname, PROTO_PATH), options)
-const grpcObj : ProtoGrpcType = (grpc.loadPackageDefinition(protoBuf) as unknown) as ProtoGrpcType
-const userService = grpcObj.userPackage
+  const protoBuf = await protoLoader.load(path.resolve(__dirname, PROTO_PATH), options);
+  return grpc.loadPackageDefinition(protoBuf) as unknown as ProtoGrpcType;
+};
 
-const main = () => {
-  databaseConnection().then(() => {
-    const server = getServer()
-    server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(),
-      (err : Error | null, port : number) => {
-        if(err) {
-          console.error(err.message)
-          return
-        }
-        console.log(`Server started on port ${port}`)
-        
-        server.start()
-      }
-    )
-  })
-}
+const startServer = async () => {
+  const grpcObj = await loadProto();
+  const userService = grpcObj.userPackage;
+  const server = new grpc.Server();
 
-const getServer = () => {
-  const server : grpc.Server = new grpc.Server()
   server.addService(userService.UserService.service, {
-    'GetAll' : (call : grpc.ServerUnaryCall<Empty, Users>, callback : grpc.sendUnaryData<Users>) => {
-      console.log('server requested')
-      UserServerService.getAll().then((users : Users | undefined) => {
-        callback(null, users)
-      }) 
+    async GetAll(call, callback) {
+      try {
+        const users = await UserServerService.getAll();
+        callback(null, users);
+      } catch (error) {
+        console.error(error);
+        callback({
+          code: grpc.status.INTERNAL,
+          message: error instanceof Error ? error.message : 'Internal Server Error',
+        });
+      }
     },
-    'CreateUser' : (call : grpc.ServerUnaryCall<User, Response>, callback : grpc.sendUnaryData<Response>) => {
-      const user = call.request
-      UserServerService.createUser(user).then((res : Response | undefined) => {
-        callback(null, res)
-      })
+    async CreateUser(call, callback) {
+      try {
+        const user = call.request;
+        const res = await UserServerService.createUser(user);
+        callback(null, res);
+      } catch (error) {
+        console.error(error);
+        callback({
+          code: grpc.status.INTERNAL,
+          message: error instanceof Error ? error.message : 'Internal Server Error',
+        });
+      }
     },
-    'UpdateUser' : (call : grpc.ServerUnaryCall<UserWithID, Response>, callback : grpc.sendUnaryData<Response>) => {
-      const user = call.request
-      UserServerService.updateUser(user).then((res : Response | undefined) => {
-        callback(null, res)
-      })
+    async UpdateUser(call, callback) {
+      try {
+        const user = call.request;
+        const res = await UserServerService.updateUser(user);
+        callback(null, res);
+      } catch (error) {
+        console.error(error);
+        callback({
+          code: grpc.status.INTERNAL,
+          message: error instanceof Error ? error.message : 'Internal Server Error',
+        });
+      }
     },
-    'DeleteUser' : (call : grpc.ServerUnaryCall<UserID, Response>, callback : grpc.sendUnaryData<Response>) => {
-      const userId = call.request
-      UserServerService.deleteUser(userId).then((res : Response | undefined) => {
-        callback(null, res)
-      })
+    async DeleteUser(call, callback) {
+      try {
+        const userId = call.request;
+        const res = await UserServerService.deleteUser(userId);
+        callback(null, res);
+      } catch (error) {
+        console.error(error);
+        callback({
+          code: grpc.status.INTERNAL,
+          message: error instanceof Error ? error.message : 'Internal Server Error',
+        });
+      }
     },
-    'Login': (call: grpc.ServerUnaryCall<LoginRequest, Response>, callback: grpc.sendUnaryData<Response>) => {
-      const loginRequest = call.request
-      UserServerService.login(loginRequest).then((res: Response | undefined) => {
-        callback(null, res)
-      })
-    }
-  } as UserServiceHandlers ) 
-  return server
-}
+    async Login(call, callback) {
+      try {
+        const loginRequest = call.request;
+        const res = await UserServerService.login(loginRequest);
+        callback(null, res);
+      } catch (error) {
+        console.error(error);
+        callback({
+          code: grpc.status.INTERNAL,
+          message: error instanceof Error ? error.message : 'Internal Server Error',
+        });
+      }
+    },
+  } as UserServiceHandlers);
 
-main()
+  server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), (err, port) => {
+    if (err) {
+      console.error(err.message);
+      return;
+    }
+    console.log(`Server started on port ${port}`);
+    server.start();
+  });
+};
+
+const main = async () => {
+  try {
+    await databaseConnection();
+    await startServer();
+  } catch (error) {
+    console.error('Failed to start server:', error);
+  }
+};
+
+main();
