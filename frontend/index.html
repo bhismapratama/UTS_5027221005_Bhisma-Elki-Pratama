@@ -30,7 +30,7 @@
         }
 
         .notifications-container {
-            width: 440px;
+            width: fit-content;
             height: auto;
             padding: 2rem;
             font-size: 0.875rem;
@@ -80,7 +80,7 @@
 
         .success-button-container {
             display: flex;
-            gap: 3rem;
+            gap: 2rem;
         }
 
         .success-button-main {
@@ -120,11 +120,160 @@
         .success-button-secondary:active {
             transform: scale(.98);
         }
+
+        /* form update */
+
+        #updateForm {
+            display: none;
+        }
+
+        .form {
+            display: flex;
+            font-family: 'poppins', sans-serif;
+            flex-direction: column;
+            gap: 15px;
+            width: 420px;
+            background-color: #fff;
+            padding: 4rem;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .title {
+            font-size: 28px;
+            color: royalblue;
+            font-weight: 600;
+            letter-spacing: -1px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding-left: 30px;
+        }
+
+        .title::before,
+        .title::after {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            left: 0px;
+            background-color: royalblue;
+        }
+
+        .title::before {
+            width: 18px;
+            height: 18px;
+            background-color: royalblue;
+        }
+
+        .title::after {
+            width: 18px;
+            height: 18px;
+            animation: pulse 1s linear infinite;
+        }
+
+        .message,
+        .updated {
+            color: rgba(88, 87, 87, 0.822);
+            font-size: 14px;
+        }
+
+        .updated {
+            text-align: center;
+        }
+
+        .updated a {
+            color: royalblue;
+        }
+
+        .updated a:hover {
+            text-decoration: underline royalblue;
+        }
+
+        .flex {
+            display: flex;
+            width: 100%;
+            gap: 6px;
+        }
+
+        .form label {
+            width: 100%;
+            position: relative;
+        }
+
+        .form label .input {
+            width: 95%;
+            padding: 20px 10px 10px 10px;
+            outline: 0;
+            border: 1px solid rgba(105, 105, 105, 0.397);
+            border-radius: 10px;
+        }
+
+        .form label .input+span {
+            position: absolute;
+            left: 10px;
+            top: 11px;
+            color: grey;
+            font-size: 1em;
+            cursor: text;
+            transition: 0.3s ease;
+        }
+
+        .form label .input:placeholder-shown+span {
+            top: 15px;
+            font-size: 1em;
+        }
+
+        .form label .input:focus+span,
+        .form label .input:valid+span {
+            top: 1px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+
+        .form label .input:valid+span {
+            color: royalblue;
+        }
+
+        .submit {
+            border: none;
+            outline: none;
+            background-color: royalblue;
+            padding: 10px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            transform: .3s ease;
+            transition: all .3s ease-in-out;
+        }
+
+        .submit:hover {
+            cursor: pointer;
+            background-color: rgb(14, 44, 137);
+        }
+
+        .submit:active {
+            transform: scale(.98);
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(0.9);
+                opacity: 1;
+            }
+
+            to {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="notifications-container">
+    <div class="notifications-container" id="success">
         <div class="success">
             <div class="flex">
                 <div class="flex-shrink-0" id="logo">
@@ -140,23 +289,52 @@
                     </p>
                     <div class="success-prompt-prompt">
                         <div id="userData"></div>
-                        <!-- <p></p> -->
                     </div>
                     <div class="success-button-container">
                         <a class="success-button-main" href="./login.html" id="login">login</a>
                         <button class="success-button-secondary" onclick="logout()" id="logout">logout</button>
-                        <!-- <button type="button" class="success-button-main">View status</button>
-                        <button type="button" class="success-button-secondary">Dismiss</button> -->
+                        <button class="success-button-secondary" onclick="update()" id="update">update</button>
+                        <button class="success-button-secondary" onclick="deleted()" id="deleted">deleted</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <form id="updateForm" class="form" method="patch">
+        <p class="title">Update User Data</p>
+
+        <label>
+            <input type="email" id="updateEmail" required class="input">
+            <span>Email</span>
+        </label>
+
+        <label>
+            <input type="password" id="updatePassword" required class="input">
+            <span>Password</span>
+        </label>
+
+        <label>
+            <input type="text" id="updateName" required class="input">
+            <span>Nama</span>
+        </label>
+
+        <label>
+            <input type="text" id="updateInstitution" required class="input">
+            <span>Institution</span>
+        </label>
+
+        <button type="button" onclick="updateUserData()" class="submit">Update</button>
+    </form>
+
     <script>
         const welcome = document.getElementById('welcome')
         const dataDisplay = document.getElementById('userData')
         const logo = document.getElementById('logo')
+        const updateForm = document.getElementById('updateForm');
+        const success = document.getElementById('success');
+        const buttonUpdate = document.getElementById('update');
+        const buttonDeleted = document.getElementById('deleted');
 
         function logout() {
             localStorage.removeItem('loggedInUser');
@@ -174,18 +352,113 @@
 
             document.title = `${loggedInUser.data} - ETS - Bhisma Elki Pratama`
             welcome.innerHTML = `Login successful - ${loggedInUser.data}`
-            // dataDisplay.innerHTML = `${loggedInUser.data}`;
             dataDisplay.innerHTML = `
                 <br/>
+                <p>UserID: ${loggedInUser.userId}</p>
                 <p>Email: ${loggedInUser.email}</p>
                 <p>Password: ${loggedInUser.password}</p>
                 <br/>
             `;
         } else {
             buttonLogout.style.display = 'none'
+            buttonUpdate.style.display = 'none'
+            buttonDeleted.style.display = 'none'
             logo.style.display = 'none'
             document.getElementById('userData').innerHTML = `<p>Belum ada data login tersimpan 🤗🙌..</p>`;
         }
+
+        function update() {
+            const loggedInUserJSON = localStorage.getItem('loggedInUser');
+            if (loggedInUserJSON) {
+                const loggedInUser = JSON.parse(loggedInUserJSON);
+                const updateEmail = document.getElementById('updateEmail');
+                const updatePassword = document.getElementById('updatePassword');
+                const updateName = document.getElementById('updateName');
+                const updateInstitution = document.getElementById('updateInstitution');
+
+                updateEmail.value = loggedInUser.email;
+                updatePassword.value = loggedInUser.password;
+                updateName.value = loggedInUser.name;
+                updateInstitution.value = loggedInUser.institution;
+
+                updateForm.style.display = 'flex';
+                success.style.display = 'none';
+            }
+        }
+
+        function updateUserData() {
+            const updateEmail = document.getElementById('updateEmail').value;
+            const updatePassword = document.getElementById('updatePassword').value;
+            const updateName = document.getElementById('updateName').value;
+            const updateInstitution = document.getElementById('updateInstitution').value;
+
+            const loggedInUserJSON = localStorage.getItem('loggedInUser');
+            if (loggedInUserJSON) {
+                const loggedInUser = JSON.parse(loggedInUserJSON);
+                const userId = loggedInUser.userId;
+
+                const updatedUserData = {
+                    email: updateEmail,
+                    password: updatePassword,
+                    name: updateName,
+                    institution: updateInstitution
+                };
+
+                fetch(`http://localhost:3001/user/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedUserData),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to update user data');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const updatedUser = { ...loggedInUser, ...updatedUserData };
+                        localStorage.setItem('loggedInUser', JSON.stringify(updatedUser));
+
+                        window.location.reload();
+                        updateForm.style.display = 'none'
+                        success.style.display = 'inline-block'
+                    })
+                    .catch(error => {
+                        console.error('Error updating user data:', error);
+                    });
+            }
+        }
+
+
+        function deleted() {
+            const loggedInUserJSON = localStorage.getItem('loggedInUser');
+            if (loggedInUserJSON) {
+                const loggedInUser = JSON.parse(loggedInUserJSON);
+                const userId = loggedInUser.userId;
+
+                fetch(`http://localhost:3001/user/${userId}`, {
+                    method: 'DELETE',
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to delete user data');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        localStorage.removeItem('loggedInUser');
+                        alert('User data deleted successfully')
+                        console.log('User data deleted successfully:', data);
+                        window.location.href = './login.html';
+                    })
+                    .catch(error => {
+                        console.error('Error deleting user data:', error);
+                    });
+            }
+        }
+
     </script>
 </body>
 

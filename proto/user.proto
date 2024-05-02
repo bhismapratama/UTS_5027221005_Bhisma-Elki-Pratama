@@ -33,6 +33,7 @@ message UserWithID {
 message Response {
   string responseMsg = 1;
   int32 code = 2;
+  string userId = 3;
 }
 
 message Empty {}
