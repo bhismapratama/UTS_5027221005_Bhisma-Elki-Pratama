@@ -85,7 +85,7 @@ export class UserServerService {
         password: loginRequest.password,
       });
       if (user)
-        return { responseMsg: `Welcome ${user.name}`, code: 200 };
+        return { responseMsg: `Welcome ${user.name}`, code: 200, userId: user._id.toString()  };
       throw new Error("Invalid email or password");
     } catch (err) {
       console.error("Error in login:", err);
