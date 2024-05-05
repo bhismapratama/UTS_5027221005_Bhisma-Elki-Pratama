@@ -10,14 +10,14 @@ import { User } from "../../proto/userPackage/User";
 export class UserServerService {
   static async getAllUser(): Promise<Users> {
     try {
-      const usersDocs = await collections.users?.find().toArray()
-      if (!usersDocs) throw new Error("No users found");
+      const dataUsers = await collections.users?.find().toArray()
+      if (!dataUsers) throw new Error("No users found");
 
-      const usersData = usersDocs.map((userDoc) => ({
-        name: userDoc.name,
-        password: userDoc.password,
-        email: userDoc.email,
-        institution: userDoc.institution,
+      const usersData = dataUsers.map((item) => ({
+        name: item.name,
+        password: item.password,
+        email: item.email,
+        institution: item.institution,
       })) as User[];
       return {
         users: usersData
