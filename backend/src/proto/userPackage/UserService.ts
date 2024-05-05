@@ -29,14 +29,14 @@ export interface UserServiceClient extends grpc.Client {
   deleteUser(argument: _userPackage_UserID, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Response__Output>): grpc.ClientUnaryCall;
   deleteUser(argument: _userPackage_UserID, callback: grpc.requestCallback<_userPackage_Response__Output>): grpc.ClientUnaryCall;
   
-  GetAll(argument: _userPackage_Empty, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
-  GetAll(argument: _userPackage_Empty, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
-  GetAll(argument: _userPackage_Empty, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
-  GetAll(argument: _userPackage_Empty, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
-  getAll(argument: _userPackage_Empty, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
-  getAll(argument: _userPackage_Empty, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
-  getAll(argument: _userPackage_Empty, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
-  getAll(argument: _userPackage_Empty, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
+  GetAllUser(argument: _userPackage_Empty, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
+  GetAllUser(argument: _userPackage_Empty, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
+  GetAllUser(argument: _userPackage_Empty, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
+  GetAllUser(argument: _userPackage_Empty, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
+  getAllUser(argument: _userPackage_Empty, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
+  getAllUser(argument: _userPackage_Empty, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
+  getAllUser(argument: _userPackage_Empty, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
+  getAllUser(argument: _userPackage_Empty, callback: grpc.requestCallback<_userPackage_Users__Output>): grpc.ClientUnaryCall;
   
   Login(argument: _userPackage_LoginRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Response__Output>): grpc.ClientUnaryCall;
   Login(argument: _userPackage_LoginRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_Response__Output>): grpc.ClientUnaryCall;
@@ -63,7 +63,7 @@ export interface UserServiceHandlers extends grpc.UntypedServiceImplementation {
   
   DeleteUser: grpc.handleUnaryCall<_userPackage_UserID__Output, _userPackage_Response>;
   
-  GetAll: grpc.handleUnaryCall<_userPackage_Empty__Output, _userPackage_Users>;
+  GetAllUser: grpc.handleUnaryCall<_userPackage_Empty__Output, _userPackage_Users>;
   
   Login: grpc.handleUnaryCall<_userPackage_LoginRequest__Output, _userPackage_Response>;
   
@@ -74,7 +74,7 @@ export interface UserServiceHandlers extends grpc.UntypedServiceImplementation {
 export interface UserServiceDefinition extends grpc.ServiceDefinition {
   CreateUser: MethodDefinition<_userPackage_User, _userPackage_Response, _userPackage_User__Output, _userPackage_Response__Output>
   DeleteUser: MethodDefinition<_userPackage_UserID, _userPackage_Response, _userPackage_UserID__Output, _userPackage_Response__Output>
-  GetAll: MethodDefinition<_userPackage_Empty, _userPackage_Users, _userPackage_Empty__Output, _userPackage_Users__Output>
+  GetAllUser: MethodDefinition<_userPackage_Empty, _userPackage_Users, _userPackage_Empty__Output, _userPackage_Users__Output>
   Login: MethodDefinition<_userPackage_LoginRequest, _userPackage_Response, _userPackage_LoginRequest__Output, _userPackage_Response__Output>
   UpdateUser: MethodDefinition<_userPackage_UserWithID, _userPackage_Response, _userPackage_UserWithID__Output, _userPackage_Response__Output>
 }

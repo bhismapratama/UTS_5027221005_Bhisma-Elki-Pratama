@@ -3,11 +3,11 @@ syntax = "proto3";
 package userPackage;
 
 service UserService {
-  rpc GetAll (Empty) returns (Users) {};
-  rpc CreateUser (User) returns (Response) {};
-  rpc UpdateUser (UserWithID) returns (Response) {};
-  rpc DeleteUser (UserID) returns (Response) {};
-  rpc Login (LoginRequest) returns (Response) {};
+  rpc CreateUser (User) returns (Response) {}; // CREATE
+  rpc GetAllUser (Empty) returns (Users) {}; // READ
+  rpc UpdateUser (UserWithID) returns (Response) {}; // UPDATE
+  rpc DeleteUser (UserID) returns (Response) {}; // DELETE
+  rpc Login (LoginRequest) returns (Response) {}; // LOGIN
 }
 
 message User {
@@ -31,9 +31,10 @@ message UserWithID {
 }
 
 message Response {
-  string responseMsg = 1;
+  string message = 1;
   int32 code = 2;
   string userId = 3;
+  User users = 4;
 }
 
 message Empty {}

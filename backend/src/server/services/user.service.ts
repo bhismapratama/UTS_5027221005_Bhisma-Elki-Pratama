@@ -1,26 +1,24 @@
-import { User } from "../../proto/userPackage/User";
 import { Users } from "../../proto/userPackage/Users";
 import { Response } from "../../proto/userPackage/Response";
 import { UserID } from "../../proto/userPackage/UserID";
-import { UserModelwithID } from "../models/user.model";
 import { collections } from "./db.service";
 import { UserWithID } from "../../proto/userPackage/UserWithID";
 import { ObjectId } from "mongodb";
 import { LoginRequest } from "../../proto/userPackage/LoginRequest";
+import { User } from "../../proto/userPackage/User";
 
 export class UserServerService {
-  static async getAll(): Promise<Users> {
+  static async getAllUser(): Promise<Users> {
     try {
-      const usersDocs = await collections.users?.find().toArray();
+      const usersDocs = await collections.users?.find().toArray()
       if (!usersDocs) throw new Error("No users found");
 
       const usersData = usersDocs.map((userDoc) => ({
-        id: userDoc._id.toString(),
         name: userDoc.name,
         password: userDoc.password,
         email: userDoc.email,
         institution: userDoc.institution,
-      })) as UserModelwithID[];
+      })) as User[];
       return {
         users: usersData
       };
@@ -32,10 +30,17 @@ export class UserServerService {
 
   static async createUser(user: User): Promise<Response> {
     try {
-      await collections.users?.insertOne(user);
+      const datas = {
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        institution: user.institution
+      }
+      await collections.users?.insertOne(datas);
       return {
         code: 200,
-        responseMsg: "Success creating new user",
+        message: "Success creating new user",
+        users: datas
       };
     } catch (err) {
       console.error("Error in createUser:", err);
@@ -52,7 +57,8 @@ export class UserServerService {
       if (res?.modifiedCount)
         return {
           code: 200,
-          responseMsg: "Success updating user",
+          message: "Success updating user",
+          users: user.user
         };
       throw new Error("User not found");
     } catch (err) {
@@ -69,7 +75,8 @@ export class UserServerService {
       if (res?.deletedCount === 1)
         return {
           code: 200,
-          responseMsg: "Success deleting user"
+          message: "Success deleting user",
+          userId: userId.id,
         };
       throw new Error("User not found");
     } catch (err) {
@@ -84,8 +91,19 @@ export class UserServerService {
         email: loginRequest.email,
         password: loginRequest.password,
       });
+      const datas = {
+        name: user?.name,
+        email: user?.email,
+        password: user?.password,
+        institution: user?.institution
+      }
       if (user)
-        return { responseMsg: `Welcome ${user.name}`, code: 200, userId: user._id.toString()  };
+        return { 
+          code: 200, 
+          message: `Welcome ${user.name}`, 
+          userId: user._id.toString(),
+          users: datas
+        };
       throw new Error("Invalid email or password");
     } catch (err) {
       console.error("Error in login:", err);

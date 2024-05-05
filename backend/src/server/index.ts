@@ -2,11 +2,6 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from '../proto/user';
 import { UserServiceHandlers } from '../proto/userPackage/UserService';
-import { Empty } from '../proto/userPackage/Empty';
-import { User } from '../proto/userPackage/User';
-import { UserWithID } from '../proto/userPackage/UserWithID';
-import { UserID } from '../proto/userPackage/UserID';
-import { LoginRequest } from '../proto/userPackage/LoginRequest';
 import { databaseConnection } from './services/db.service';
 import { UserServerService } from './services/user.service';
 import path from 'path';
@@ -33,9 +28,9 @@ const startServer = async () => {
   const server = new grpc.Server();
 
   server.addService(userService.UserService.service, {
-    async GetAll(call, callback) {
+    async GetAllUser(call, callback) {
       try {
-        const users = await UserServerService.getAll();
+        const users = await UserServerService.getAllUser();
         callback(null, users);
       } catch (error) {
         console.error(error);

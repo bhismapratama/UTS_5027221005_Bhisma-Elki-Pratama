@@ -41,7 +41,7 @@ const startServer = async () => {
   app.get('/user', async (req: Request, res: Response) => {
     try {
       const response = await new Promise((resolve, reject) => {
-        client.GetAll({}, (failed: any, success: any) => {
+        client.GetAllUser({}, (failed: any, success: any) => {
           if (failed) reject(failed);
           else resolve(success);
         });

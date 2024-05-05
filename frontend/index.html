@@ -350,13 +350,15 @@
             const loggedInUser = JSON.parse(loggedInUserJSON);
             login.style.display = 'none'
 
-            document.title = `${loggedInUser.data} - ETS - Bhisma Elki Pratama`
-            welcome.innerHTML = `Login successful - ${loggedInUser.data}`
+            document.title = `${loggedInUser.name} - ETS - Bhisma Elki Pratama`
+            welcome.innerHTML = `Login successful - ${loggedInUser.name}`
             dataDisplay.innerHTML = `
                 <br/>
                 <p>UserID: ${loggedInUser.userId}</p>
                 <p>Email: ${loggedInUser.email}</p>
                 <p>Password: ${loggedInUser.password}</p>
+                <p>Nama: ${loggedInUser.name}</p>
+                <p>Institution: ${loggedInUser.institution}</p>
                 <br/>
             `;
         } else {
