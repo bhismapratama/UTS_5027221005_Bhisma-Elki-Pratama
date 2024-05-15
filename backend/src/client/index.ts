@@ -1,18 +1,18 @@
-import * as grpc from '@grpc/grpc-js'
-import * as protoLoader from '@grpc/proto-loader'
-import { ProtoGrpcType } from '../proto/user'
-import path from 'path'
-import { UserID } from '../proto/userPackage/UserID'
-import { User } from '../proto/userPackage/User'
-import { UserWithID } from '../proto/userPackage/UserWithID'
-import express, { Request, Response } from 'express'
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import { ProtoGrpcType } from '../proto/user';
+import path from 'path';
+import express, { Request, Response } from 'express';
+import authCors from '../middleware/authCors';
+import { UserID } from '../proto/userPackage/UserID';
+import { UserWithID } from '../proto/userPackage/UserWithID';
 import { LoginRequest } from '../proto/userPackage/LoginRequest';
-import authCors from '../middleware/authCors'
+import { promisify } from 'util';
 
-const PROTO_PATH: string = "../../../proto/user.proto"
-const PORT: number = 8080
+const PROTO_PATH: string = path.resolve(__dirname, '../../../proto/user.proto');
+const PORT: number = 8080;
 
-const loadProto = async () => {
+const loadProto = async (): Promise<ProtoGrpcType> => {
   const options = {
     keepCase: true,
     longs: String,
@@ -20,17 +20,22 @@ const loadProto = async () => {
     defaults: true,
     oneofs: true,
   };
-
-  const protoBuf = await protoLoader.load(path.resolve(__dirname, PROTO_PATH), options);
+  const protoBuf = await protoLoader.load(PROTO_PATH, options);
   return grpc.loadPackageDefinition(protoBuf) as unknown as ProtoGrpcType;
 };
 
 const startServer = async () => {
   const grpcObj = await loadProto();
-  const client = new (grpcObj.userPackage.UserService)(
+  const client = new grpcObj.userPackage.UserService(
     `0.0.0.0:${PORT}`,
     grpc.credentials.createInsecure()
   );
+
+  const getAllUserAsync = promisify(client.GetAllUser).bind(client);
+  const createUserAsync = promisify(client.createUser).bind(client);
+  const updateUserAsync = promisify(client.updateUser).bind(client);
+  const deleteUserAsync = promisify(client.deleteUser).bind(client);
+  const loginAsync = promisify(client.Login).bind(client);
 
   console.log(`Server running on port ${PORT}`);
 
@@ -40,12 +45,7 @@ const startServer = async () => {
 
   app.get('/user', async (req: Request, res: Response) => {
     try {
-      const response = await new Promise((resolve, reject) => {
-        client.GetAllUser({}, (failed: any, success: any) => {
-          if (failed) reject(failed);
-          else resolve(success);
-        });
-      });
+      const response = await getAllUserAsync({});
       res.send(response);
     } catch (error) {
       console.error(error);
@@ -55,13 +55,7 @@ const startServer = async () => {
 
   app.post('/user', async (req: Request, res: Response) => {
     try {
-      const response = await new Promise((resolve, reject) => {
-        const createInput: User = req.body
-        client.createUser(createInput, (failed: any, success: any) => {
-          if (failed) reject(failed);
-          else resolve(success);
-        });
-      });
+      const response = await createUserAsync(req.body);
       res.send(response);
     } catch (error) {
       console.error(error);
@@ -73,14 +67,9 @@ const startServer = async () => {
     try {
       const user: UserWithID = {
         userId: { id: req.params.id },
-        user: req.body
+        user: req.body,
       };
-      const response = await new Promise((resolve, reject) => {
-        client.updateUser(user, (failed: any, success: any) => {
-          if (failed) reject(failed);
-          else resolve(success);
-        });
-      });
+      const response = await updateUserAsync(user);
       res.send(response);
     } catch (error) {
       console.error(error);
@@ -91,12 +80,7 @@ const startServer = async () => {
   app.delete('/user/:id', async (req: Request, res: Response) => {
     try {
       const userId: UserID = { id: req.params.id };
-      const response = await new Promise((resolve, reject) => {
-        client.deleteUser(userId, (failed: any, success: any) => {
-          if (failed) reject(failed);
-          else resolve(success);
-        });
-      });
+      const response = await deleteUserAsync(userId);
       res.send(response);
     } catch (error) {
       console.error(error);
@@ -107,12 +91,7 @@ const startServer = async () => {
   app.post('/login', async (req: Request, res: Response) => {
     try {
       const loginInput: LoginRequest = req.body;
-      const response = await new Promise((resolve, reject) => {
-        client.Login(loginInput, (failed: any, success: any) => {
-          if (failed) reject(failed);
-          else resolve(success);
-        });
-      });
+      const response = await loginAsync(loginInput);
       res.send(response);
     } catch (error) {
       console.error(error);
@@ -120,7 +99,7 @@ const startServer = async () => {
     }
   });
 
-  const listen = 3001
+  const listen = 3001;
   app.listen(listen, () => {
     console.log(`Client is started on port ${listen}`);
   });

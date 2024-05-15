@@ -1,12 +1,12 @@
 {
-  "name": "server",
+  "name": "user-management-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node build/index.js",
-    "server": "nodemon ./src/server/index.ts",
-    "client": "nodemon ./src/client/index.ts",
+    "startServer": "nodemon ./src/server/index.ts",
+    "startClient": "nodemon ./src/client/index.ts",
     "proto": "./proto.sh"
   },
   "keywords": [],
